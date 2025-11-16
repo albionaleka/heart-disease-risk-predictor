@@ -91,20 +91,20 @@ const Login = () => {
 
                 <form onSubmit={handleSubmit} className="mb-3">
                     {action === "Register" && (
-                        <div className="mb-4 flex items-center gap-3 w-full px-5 py-2 rounded-full bg-slate-700">
+                        <div className="mb-4 flex items-center gap-3 w-full px-5 py-2 rounded-lg bg-slate-700">
                             <FaUser />
                             <input type="text" className="bg-transparent outline-none" placeholder="Full Name"
                                 value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
                         </div>
                     )}
                     
-                    <div className="mb-4 flex items-center gap-3 w-full px-5 py-2 rounded-full bg-slate-700">
+                    <div className="mb-4 flex items-center gap-3 w-full px-5 py-2 rounded-lg bg-slate-700">
                         <IoMdMail />
                         <input type="email" id="email" className="bg-transparent outline-none" placeholder="Email" 
                             value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} required />
                     </div>
 
-                    <div className="mb-4 flex items-center gap-3 w-full px-5 py-2 rounded-full bg-slate-700">
+                    <div className="mb-4 flex items-center gap-3 w-full px-5 py-2 rounded-lg bg-slate-700">
                         <FaLock />
                         <input type="password" id="password" className="bg-transparent outline-none" placeholder="Password"
                             value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} required />
@@ -112,7 +112,7 @@ const Login = () => {
                     </div>
 
                     {action === "Register" && (
-                        <div className="mb-4 flex items-center gap-3 w-full px-5 py-2 rounded-full bg-slate-700">
+                        <div className="mb-4 flex items-center gap-3 w-full px-5 py-2 rounded-lg bg-slate-700">
                             <FaLock />
                             <input type="password" id="confirm" className="bg-transparent outline-none" placeholder="Confirm Password"
                                 value={formData.confirm} onChange={e => setFormData({...formData, confirm: e.target.value})} required />
@@ -123,7 +123,7 @@ const Login = () => {
                     {action === "Login" && 
                         <p onClick={() => nav("/reset")} className="mb-4 text-indigo-400 cursor-pointer">Forgot Password?</p>}
 
-                    <button className="w-full py-2 rounded-full bg-violet-500 hover:bg-violet-600 text-white">{action === "Register" ? "Signup": "Log in"}</button>
+                    <button className="w-full py-2 rounded-lg bg-violet-500 hover:bg-violet-600 text-white">{action === "Register" ? "Signup": "Log in"}</button>
                 </form>
                     
                 {action === "Register" 

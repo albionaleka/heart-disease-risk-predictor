@@ -76,7 +76,7 @@ const VerifyAccount = () => {
                 </div>
 
                 <div className="w-full flex items-center justify-center">
-                    <button type="submit" className="rounded-full bg-violet-500 text-white text-lg px-4 py-2">Verify</button>
+                    <button type="submit" className="rounded-lg bg-violet-500 text-white text-lg px-4 py-2">Verify</button>
                 </div>
             </form>
         </div>

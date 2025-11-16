@@ -39,6 +39,10 @@ const patientSchema = new mongoose.Schema({
     heartRiskScore: {
         type: Number,
         default: null
+    },
+    heartRiskLabel: {
+        type: Number,
+        default: null
     }       
 });
 

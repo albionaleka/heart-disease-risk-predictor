@@ -4,3 +4,68 @@
 * {
   font-family: "Outfit", sans-serif;
 }
+
+:root {
+  --app-bg: #f8fafc;
+  --app-text: #0f172a;
+  --card-bg: #ffffff;
+  --card-bg-hover: #f1f5f9;
+  --card-border: rgba(15,23,42,0.06);
+  --border-color: rgba(15,23,42,0.06);
+  --navbar-height: 64px;
+  --accent: #8b5cf6;
+  --accent-hover: #7c3aed;
+  --card-shadow: 0 2px 16px 0 rgba(0,0,0,0.04);
+  --text-secondary: rgba(15,23,42,0.6);
+  --text-muted: rgba(15,23,42,0.4);
+  --text-disabled: rgba(15,23,42,0.3);
+}
+
+.dark {
+  --app-bg: #0b1220;
+  --app-text: #e6eef8;
+  --card-bg: #141a23;
+  --card-bg-hover: #1a2230;
+  --card-border: rgba(255,255,255,0.06);
+  --border-color: rgba(255,255,255,0.06);
+  --accent: #a78bfa;
+  --accent-hover: #c4b5fd;
+  --card-shadow: 0 2px 16px 0 rgba(0,0,0,0.23);
+  --text-secondary: rgba(230,238,248,0.7);
+  --text-muted: rgba(230,238,248,0.5);
+  --text-disabled: rgba(230,238,248,0.4);
+}
+
+body {
+  background-color: var(--app-bg);
+  color: var(--app-text);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.card {
+  background: var(--card-bg);
+  color: var(--app-text);
+  border-radius: 1rem;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-color);
+  transition: background-color 0.25s, color 0.25s, box-shadow 0.25s;
+}
+
+.card:hover, .hover\:card-bg-hover:hover {
+  background: var(--card-bg-hover) !important;
+  box-shadow: 0 4px 32px 0 rgba(0,0,0,0.10);
+}
+
+/* Soften Tailwind borders globally. Uses a CSS variable so theme can tune the shade. */
+.border,
+.border-b,
+.border-t,
+.border-l,
+.border-r {
+  border-color: var(--border-color) !important;
+}
+
+/* Soften focused ring outlines slightly */
+*:focus {
+  outline-color: rgba(59,130,246,0.25);
+}

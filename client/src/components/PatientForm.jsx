@@ -146,7 +146,7 @@ const PatientForm = () => {
                     <div className="col-span-1 md:col-span-2">
                         <button
                             type="submit"
-                            className="w-full rounded-full font-bold py-2 px-4 shadow card transition-all mt-2" style={{background:'var(--accent)', color:'#fff'}} onMouseEnter={e=>e.currentTarget.style.background='var(--accent-hover)'} onMouseLeave={e=>e.currentTarget.style.background='var(--accent)'}>Submit</button>
+                            className="w-full rounded-lg font-bold py-2 px-4 shadow card transition-all mt-2" style={{background:'var(--accent)', color:'#fff'}} onMouseEnter={e=>e.currentTarget.style.background='var(--accent-hover)'} onMouseLeave={e=>e.currentTarget.style.background='var(--accent)'}>Submit</button>
                     </div>
                 </form>
             </div>

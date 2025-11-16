@@ -2,24 +2,15 @@ import { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
 import HeartRiskCard from './HeartRiskCard';
 import { toast } from 'react-toastify';
+import { useParams, useNavigate } from 'react-router-dom';
 
-const HeartPredictionForm = ({ patientId }) => {
+const HeartPredictionForm = () => {
+  const { id, patientId: routePatientId } = useParams();
+  const navigate = useNavigate();
+  const patientId = id || routePatientId;
   const [form, setForm] = useState({
-    age: '',
-    sex: '', // this is 0 for female, 1 for male (from gender)
-    cp: '',
-    trestbps: '',
-    chol: '',
-    fbs: '',
-    restecg: '',
-    thalach: '',
-    exang: '',
-    oldpeak: '',
-    slope: '',
-    ca: '',
-    thal: ''
+    age: '', sex: '', cp: '', trestbps: '', chol: '', fbs: '', restecg: '', thalach: '', exang: '', oldpeak: '', slope: '', ca: '', thal: ''
   });
-
   const { backend } = useContext(AppContext);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -36,6 +27,10 @@ const HeartPredictionForm = ({ patientId }) => {
               sex: data.patientData.gender === 'male' ? 1 : 0
             }));
           }
+        })
+        .catch(err => {
+          console.error('Failed to fetch patient data:', err);
+          toast.error('Failed to load patient data');
         });
     }
   }, [patientId, backend]);
@@ -53,37 +48,28 @@ const HeartPredictionForm = ({ patientId }) => {
       const apiForm = { ...form };
       apiForm.age = Number(form.age);
       apiForm.sex = Number(form.sex);
-      const restFields = ['cp','trestbps','chol','fbs','restecg','thalach','exang','oldpeak','slope','ca','thal'];
-      
-      restFields.forEach(f => {
+      ['cp','trestbps','chol','fbs','restecg','thalach','exang','oldpeak','slope','ca','thal'].forEach(f => {
         if (apiForm[f] !== undefined && apiForm[f] !== "") apiForm[f] = Number(apiForm[f]);
       });
-
-      // Include patientId in the prediction request
-      if (patientId) {
-        apiForm.patientId = patientId;
-      }
-
+      if (patientId) apiForm.patientId = patientId;
       const res = await fetch(backend + '/api/prediction/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(apiForm)
       });
-
       const data = await res.json();
+      if (!res.ok || data.probability === undefined) {
+        throw new Error(data.message || 'Failed to get prediction');
+      }
       setResult({ probability: data.probability, label: data.label });
-      
-      if (patientId && data.probability !== undefined) {
+      if (patientId) {
         toast.success('Prediction saved! The new risk score has been updated and added to test history.');
-        // Refresh the page to show updated patient data with new prediction
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
+        setTimeout(() => navigate(`/patient/${patientId}`), 2500);
+      } else {
+        toast.success('Prediction completed successfully!');
       }
     } catch (err) {
-      console.error(err);
-      toast.error('Failed to predict heart disease risk.');
-      setResult(null);
+      toast.error('Failed to predict heart disease risk: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -101,8 +87,8 @@ const HeartPredictionForm = ({ patientId }) => {
               name="age"
               value={form.age}
               disabled
-              className="border border-gray-300 rounded px-3 py-2 bg-gray-200 text-gray-600 cursor-not-allowed"
-              style={{ color: 'var(--app-text)' }}
+              className="border rounded-lg px-3 py-2 bg-[var(--card-bg-hover)] cursor-not-allowed"
+              style={{ color: 'var(--text-muted)', borderColor: 'var(--border-color)', background: 'var(--card-bg-hover)' }}
               required
               readOnly
             />
@@ -114,12 +100,12 @@ const HeartPredictionForm = ({ patientId }) => {
               name="sex"
               value={form.sex}
               disabled
-              className="border border-gray-300 rounded px-3 py-2 bg-gray-200 text-gray-600 cursor-not-allowed"
+              className="border rounded-lg px-3 py-2 bg-[var(--card-bg-hover)] cursor-not-allowed"
+              style={{ color: 'var(--text-muted)', borderColor: 'var(--border-color)', background: 'var(--card-bg-hover)' }}
               required
               readOnly
             />
           </div>
-          {/* Render all remaining fields from form, except age and sex */}
           {Object.keys(form)
             .filter(key => key !== 'age' && key !== 'sex')
             .map((key) => (
@@ -130,8 +116,8 @@ const HeartPredictionForm = ({ patientId }) => {
                   name={key}
                   value={form[key]}
                   onChange={handleChange}
-                  className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent"
-                  style={{ color: 'var(--app-text)' }}
+                  className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent"
+                  style={{ color: 'var(--app-text)', borderColor: 'var(--border-color)', background: 'var(--card-bg)' }}
                   required
                 />
               </div>
@@ -139,8 +125,11 @@ const HeartPredictionForm = ({ patientId }) => {
           <div className="col-span-2">
             <button
               type="submit"
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+              className="w-full font-bold py-2 px-4 rounded-lg transition-all"
+              style={{ background: 'var(--accent)', color:'#fff' }}
               disabled={loading}
+              onMouseEnter={e=>e.currentTarget.style.background='var(--accent-hover)'}
+              onMouseLeave={e=>e.currentTarget.style.background='var(--accent)'}
             >
               {loading ? 'Predicting...' : 'Predict'}
             </button>
@@ -153,11 +142,10 @@ const HeartPredictionForm = ({ patientId }) => {
             <HeartRiskCard probability={result.probability} label={result.label} />
           </div>
         ) : (
-          <div className="w-full text-center text-gray-500">Prediction result will appear here</div>
+          <div className="w-full text-center" style={{ color: 'var(--text-muted)' }}>Prediction result will appear here</div>
         )}
       </div>
     </div>
   );
-};
-
+}
 export default HeartPredictionForm;

@@ -5,6 +5,8 @@ import cookieParser from 'cookie-parser';
 import connectDB from './config/mongodb.js';
 import authRouter from './routes/authRoutes.js';
 import userRouter from './routes/userRoutes.js';
+import patientRouter from './routes/patientRoutes.js';
+import predictionRouter from './routes/predictionRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -23,6 +25,9 @@ app.use(cors(corsOptions));
 
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
+
+app.use('/api/patient', patientRouter);
+app.use('/api/prediction', predictionRouter);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);

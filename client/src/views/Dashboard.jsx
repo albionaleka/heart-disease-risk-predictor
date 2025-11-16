@@ -55,23 +55,21 @@ const Dashboard = () => {
   if (filter === 'no') filtered = noScore;
 
   // Prepare data for charts
-  const riskDistributionData = stats && stats.riskLevels ? [
-    { name: 'High Risk', value: stats.riskLevels.high || 0, percent: stats.riskLevels.highPercent || 0 },
-    { name: 'Low Risk', value: stats.riskLevels.low || 0, percent: stats.riskLevels.lowPercent || 0 }
-  ].filter(item => item.value > 0) : [];
+  const riskDistributionData = stats ? [
+    { name: 'High Risk', value: stats.riskLevels.high, percent: stats.riskLevels.highPercent || 0 },
+    { name: 'Low Risk', value: stats.riskLevels.low, percent: stats.riskLevels.lowPercent || 0 }
+  ] : [];
 
-  const genderDiseaseData = stats && stats.genderBreakdown ? [
-    { gender: 'Male', Healthy: stats.genderBreakdown.male?.healthy || 0, Diseased: stats.genderBreakdown.male?.diseased || 0 },
-    { gender: 'Female', Healthy: stats.genderBreakdown.female?.healthy || 0, Diseased: stats.genderBreakdown.female?.diseased || 0 }
+  const genderDiseaseData = stats ? [
+    { gender: 'Male', Healthy: stats.genderBreakdown.male.healthy, Diseased: stats.genderBreakdown.male.diseased },
+    { gender: 'Female', Healthy: stats.genderBreakdown.female.healthy, Diseased: stats.genderBreakdown.female.diseased }
   ] : [];
 
   const chestPainLabels = { 0: 'Typical Angina', 1: 'Atypical Angina', 2: 'Non-anginal', 3: 'Asymptomatic' };
-  const chestPainData = stats && stats.chestPainTypes && Array.isArray(stats.chestPainTypes) 
-    ? stats.chestPainTypes.map(cp => ({
-        type: chestPainLabels[cp.type] || `Type ${cp.type}`,
-        count: cp.count || 0
-      })).filter(cp => cp.count > 0)
-    : [];
+  const chestPainData = stats ? stats.chestPainTypes.map(cp => ({
+    type: chestPainLabels[cp.type] || `Type ${cp.type}`,
+    count: cp.count
+  })) : [];
 
   const COLORS = ['#ef4444', '#10b981'];
 
@@ -235,19 +233,19 @@ const Dashboard = () => {
             <div>
               <div className="flex justify-between mb-1">
                 <span className="text-sm">Male - Diseased</span>
-                <span className="text-sm font-semibold">{stats?.genderBreakdown?.male?.diseased || 0}</span>
+                <span className="text-sm font-semibold">{stats?.genderBreakdown.male.diseased || 0}</span>
               </div>
               <div className="flex justify-between mb-1">
                 <span className="text-sm">Male - Healthy</span>
-                <span className="text-sm font-semibold">{stats?.genderBreakdown?.male?.healthy || 0}</span>
+                <span className="text-sm font-semibold">{stats?.genderBreakdown.male.healthy || 0}</span>
               </div>
               <div className="flex justify-between mb-1">
                 <span className="text-sm">Female - Diseased</span>
-                <span className="text-sm font-semibold">{stats?.genderBreakdown?.female?.diseased || 0}</span>
+                <span className="text-sm font-semibold">{stats?.genderBreakdown.female.diseased || 0}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm">Female - Healthy</span>
-                <span className="text-sm font-semibold">{stats?.genderBreakdown?.female?.healthy || 0}</span>
+                <span className="text-sm font-semibold">{stats?.genderBreakdown.female.healthy || 0}</span>
               </div>
             </div>
           </div>
@@ -296,8 +294,6 @@ const Dashboard = () => {
           <h3 className="text-lg font-semibold mb-4">Risk Distribution</h3>
           {statsLoading || !stats ? (
             <div className="h-64 flex items-center justify-center" style={{ color: 'var(--text-muted)' }}>Loading...</div>
-          ) : riskDistributionData.length === 0 ? (
-            <div className="h-64 flex items-center justify-center" style={{ color: 'var(--text-muted)' }}>No data available</div>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
@@ -306,7 +302,7 @@ const Dashboard = () => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => percent !== undefined && !isNaN(percent) ? `${name}: ${(percent).toFixed(1)}%` : name}
+                  label={({ name, percent }) => `${name}: ${(percent).toFixed(1)}%`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
@@ -328,7 +324,7 @@ const Dashboard = () => {
             <div className="h-64 flex items-center justify-center" style={{ color: 'var(--text-muted)' }}>Loading...</div>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={stats?.ageDistribution || []}>
+              <BarChart data={stats.ageDistribution}>
                 <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
                 <XAxis dataKey="range" stroke={chartTextColor} tick={{ fill: chartTextColor }} />
                 <YAxis stroke={chartTextColor} tick={{ fill: chartTextColor }} />
@@ -344,8 +340,6 @@ const Dashboard = () => {
           <h3 className="text-lg font-semibold mb-4">Gender vs Disease</h3>
           {statsLoading || !stats ? (
             <div className="h-64 flex items-center justify-center" style={{ color: 'var(--text-muted)' }}>Loading...</div>
-          ) : genderDiseaseData.length === 0 ? (
-            <div className="h-64 flex items-center justify-center" style={{ color: 'var(--text-muted)' }}>No data available</div>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={genderDiseaseData}>
@@ -368,7 +362,7 @@ const Dashboard = () => {
             <div className="h-64 flex items-center justify-center" style={{ color: 'var(--text-muted)' }}>Loading...</div>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chestPainData.length > 0 ? chestPainData : []} layout="vertical">
+              <BarChart data={chestPainData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
                 <XAxis type="number" stroke={chartTextColor} tick={{ fill: chartTextColor }} />
                 <YAxis dataKey="type" type="category" width={120} stroke={chartTextColor} tick={{ fill: chartTextColor }} />
@@ -386,7 +380,7 @@ const Dashboard = () => {
             <div className="h-64 flex items-center justify-center" style={{ color: 'var(--text-muted)' }}>Loading...</div>
           ) : (
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={stats?.featureImportance || []} layout="vertical">
+              <BarChart data={stats.featureImportance} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
                 <XAxis type="number" domain={[0, 0.3]} stroke={chartTextColor} tick={{ fill: chartTextColor }} />
                 <YAxis dataKey="feature" type="category" width={150} stroke={chartTextColor} tick={{ fill: chartTextColor }} />
@@ -532,13 +526,13 @@ const Dashboard = () => {
               <span>Max: {cholesterolStats.max}</span>
             </div>
           </div>
-        </div>
+      </div>
       )}
 
       {/* Patient Table Section */}
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-4">Patient Records</h2>
-        <div className="flex gap-2 mb-2">
+      <div className="flex gap-2 mb-2">
           <button 
             onClick={() => setFilter('all')} 
             className={`rounded px-4 py-1 border transition`}
@@ -603,24 +597,24 @@ const Dashboard = () => {
           >
             No Score
           </button>
-        </div>
-        <div className="overflow-x-auto card p-4 mt-3">
-          {loading ? (
+      </div>
+      <div className="overflow-x-auto card p-4 mt-3">
+        {loading ? (
             <div className="text-center py-6" style={{ color: 'var(--text-muted)' }}>Loading...</div>
-          ) : filtered.length === 0 ? (
+        ) : filtered.length === 0 ? (
             <div className="text-center py-8" style={{ color: 'var(--text-secondary)' }}>No patients found.</div>
-          ) : (
-            <table className="min-w-full">
-              <thead>
-                <tr>
+        ) : (
+        <table className="min-w-full">
+          <thead>
+            <tr>
                   <th className="px-4 py-2 text-left" style={{ color: 'var(--app-text)' }}>Name</th>
                   <th className="px-4 py-2 text-left" style={{ color: 'var(--app-text)' }}>Age</th>
                   <th className="px-4 py-2 text-left" style={{ color: 'var(--app-text)' }}>Gender</th>
                   <th className="px-4 py-2 text-left" style={{ color: 'var(--app-text)' }}>Heart Risk Score</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((p) => (
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((p) => (
                   <tr 
                     key={p._id} 
                     className="hover:card-bg-hover cursor-pointer transition-colors" 
@@ -629,18 +623,18 @@ const Dashboard = () => {
                     <td className="px-4 py-2" style={{ color: 'var(--app-text)' }}>{p.name}</td>
                     <td className="px-4 py-2" style={{ color: 'var(--app-text)' }}>{p.age}</td>
                     <td className="px-4 py-2" style={{ color: 'var(--app-text)' }}>{p.gender}</td>
-                    <td className="px-4 py-2 font-semibold">
+                <td className="px-4 py-2 font-semibold">
                       {p.heartRiskScore === null || p.heartRiskScore === undefined ? (
                         <span style={{ color: 'var(--text-disabled)' }}>N/A</span>
                       ) : (
                         <span className={p.heartRiskScore>=0.5?"text-red-600":"text-cyan-600"}>{(p.heartRiskScore*100).toFixed(1)}%</span>
                       )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        )}
         </div>
       </div>
     </div>

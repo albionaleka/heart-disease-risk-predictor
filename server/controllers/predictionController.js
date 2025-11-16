@@ -33,7 +33,8 @@ export const predictHeartRisk = async (req, res) => {
         await Test.create(testData);
 
         await Patient.findByIdAndUpdate(patientId, { 
-          heartRiskScore: data.probability 
+          heartRiskScore: data.probability,
+          heartRiskLabel: data.label
         });
       } else {
         const predictionData = {
@@ -71,7 +72,6 @@ export const predictHeartRisk = async (req, res) => {
 
 export const getDashboardStats = async (req, res) => {
   try {
-    // Get all patients with their saved heartRiskScore
     const patients = await Patient.find({ heartRiskScore: { $ne: null } });
     
     if (patients.length === 0) {
@@ -109,7 +109,6 @@ export const getDashboardStats = async (req, res) => {
       });
     }
 
-    // Get the latest test result for each patient to get detailed stats
     const patientIds = patients.map(p => p._id);
     let latestTests = [];
     
@@ -124,22 +123,17 @@ export const getDashboardStats = async (req, res) => {
           }},
           { $replaceRoot: { newRoot: "$latestTest" } }
         ]);
-
-        latestTests = latestTests.filter(t => t && t.patientId);
       } catch (err) {
         console.error("Error fetching latest tests:", err);
         latestTests = [];
       }
     }
 
-    // Use patient data with their saved heartRiskScore for risk level stats
     const totalPredictions = patients.length;
 
-    // High risk: >= 0.5, Low risk: < 0.5
     const highRisk = patients.filter(p => p.heartRiskScore >= 0.5).length;
     const lowRisk = patients.filter(p => p.heartRiskScore < 0.5).length;
 
-    // Calculate averages from latest test results
     const testsWithData = latestTests.filter(t => t !== null && t !== undefined);
     const avgAge = testsWithData.length > 0 
       ? testsWithData.reduce((sum, t) => sum + t.age, 0) / testsWithData.length 
@@ -151,13 +145,11 @@ export const getDashboardStats = async (req, res) => {
       ? testsWithData.reduce((sum, t) => sum + t.trestbps, 0) / testsWithData.length
       : 0;
 
-    // Gender breakdown - use latest test results
     const maleWithDisease = testsWithData.filter(t => t.sex === 1 && t.prediction === 1).length;
     const maleHealthy = testsWithData.filter(t => t.sex === 1 && t.prediction === 0).length;
     const femaleWithDisease = testsWithData.filter(t => t.sex === 0 && t.prediction === 1).length;
     const femaleHealthy = testsWithData.filter(t => t.sex === 0 && t.prediction === 0).length;
 
-    // Chest pain types from latest tests
     const chestPainCounts = [0, 1, 2, 3].map(type => ({
       type,
       count: testsWithData.filter(t => t.cp === type).length
@@ -166,7 +158,6 @@ export const getDashboardStats = async (req, res) => {
       ? chestPainCounts.reduce((max, curr) => curr.count > max.count ? curr : max)
       : { type: 0, count: 0 };
 
-    // Age distribution from patients
     const ageRanges = [
       { range: "20-30", min: 20, max: 30 },
       { range: "31-40", min: 31, max: 40 },
@@ -203,8 +194,6 @@ export const getDashboardStats = async (req, res) => {
       return denominator === 0 ? 0 : numerator / denominator;
     };
 
-    // Use latest test results for correlation matrix
-    // Only calculate if we have enough data
     const numericFeatures = testsWithData.length > 0 ? {
       age: testsWithData.map(t => t.age || 0),
       trestbps: testsWithData.map(t => t.trestbps || 0),

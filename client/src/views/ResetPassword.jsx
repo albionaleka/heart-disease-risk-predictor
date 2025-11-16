@@ -94,14 +94,14 @@ const ResetPassword = () => {
                     <h1 className="text-2xl text-white font-semibold text-center mb-2">Reset Password</h1>
                     <p className="text-slate-400 mb-4">Enter your account's email address</p>
 
-                    <div className="mb-4 flex items-center gap-3 w-full px-5 py-2 rounded-full bg-slate-700">
+                    <div className="mb-4 flex items-center gap-3 w-full px-5 py-2 rounded-lg bg-slate-700">
                         <IoMdMail />
                         <input type="email" id="email" className="bg-transparent outline-none" placeholder="Email" 
                             value={email} onChange={e => setEmail(e.target.value)} required />
                     </div>
 
                     <div className="flex items-center justify-center">
-                        <button className="bg-violet-500 hover:bg-violet-600 text-white rounded-full py-2 px-4">Submit</button>
+                        <button className="bg-violet-500 hover:bg-violet-600 text-white rounded-lg py-2 px-4">Submit</button>
                     </div>
                 </form>}
             
@@ -118,7 +118,7 @@ const ResetPassword = () => {
                     </div>
 
                     <div className="flex items-center justify-center">
-                        <button className="bg-violet-500 hover:bg-violet-600 text-white rounded-full py-2 px-4">Submit</button>
+                        <button className="bg-violet-500 hover:bg-violet-600 text-white rounded-lg py-2 px-4">Submit</button>
                     </div>
                 </form>}
             
@@ -126,7 +126,7 @@ const ResetPassword = () => {
                 <form onSubmit={reset} className="bg-slate-900 p-8 rounded-lg shadow-lg w-full md:w-96 text-indigo-300">
                     <h1 className="text-2xl text-white font-semibold text-center mb-2">New Password</h1>
                     
-                    <div className="mb-4 flex items-center gap-3 w-full px-6 py-2 rounded-full bg-slate-700">
+                    <div className="mb-4 flex items-center gap-3 w-full px-6 py-2 rounded-lg bg-slate-700">
                         <FaLock />
                         <input type="password" id="password" className="bg-transparent outline-none" placeholder="Password"
                             value={password} onChange={e => setPassword(e.target.value)} required />
@@ -134,7 +134,7 @@ const ResetPassword = () => {
                     </div>
 
                     <div className="flex items-center justify-center">
-                        <button className="bg-violet-500 hover:bg-violet-600 text-white rounded-full py-2 px-4">Reset</button>
+                        <button className="bg-violet-500 hover:bg-violet-600 text-white rounded-lg py-2 px-4">Reset</button>
                     </div>
                 </form>}     
         </div>
