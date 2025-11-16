@@ -38,6 +38,18 @@ const PatientRecords = () => {
         navigate(`/edit-patient/${patientId}`);
     }
 
+    const getAppointmentStatus = (patient) => {
+        if (!patient || patient.heartRiskScore < 0.5 || !patient.lastCheckup) return null;
+        const lastCheckup = new Date(patient.lastCheckup);
+        const nextAppointment = new Date(lastCheckup);
+        nextAppointment.setDate(nextAppointment.getDate() + 28);
+        const today = new Date();
+        const daysUntil = Math.ceil((nextAppointment - today) / (1000 * 60 * 60 * 24));
+        if (daysUntil < 0) return { type: 'overdue', days: Math.abs(daysUntil) };
+        if (daysUntil <= 7) return { type: 'due', days: daysUntil };
+        return null;
+    };
+
     return (
         <div className="w-full flex items-center flex-col mt-auto">
             <div className="mb-3 w-full md:w-2/3 mx-auto p-6 shadow rounded-lg mt-6" style={{ background: 'var(--card-bg)', color: 'var(--app-text)' }}>
@@ -56,23 +68,39 @@ const PatientRecords = () => {
                                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--app-text)' }}>Gender</th>
                                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--app-text)' }}>Contact</th>
                                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--app-text)' }}>Email</th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--app-text)' }}>Status</th>
                                     <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--app-text)' }}>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {records.map((record) => (
-                                    <tr key={record._id || record.id} onClick={() => window.location.href = `/patient/${record._id}`} className="transition-all hover:card-bg-hover cursor-pointer rounded-lg">
-                                        <td className="px-4 py-4 whitespace-nowrap" style={{ color: 'var(--app-text)' }}>{record.name}</td>
-                                        <td className="px-4 py-4 whitespace-nowrap" style={{ color: 'var(--app-text)' }}>{record.age}</td>
-                                        <td className="px-4 py-4 whitespace-nowrap" style={{ color: 'var(--app-text)' }}>{record.gender}</td>
-                                        <td className="px-4 py-4 whitespace-nowrap" style={{ color: 'var(--app-text)' }}>{record.contactNumber}</td>
-                                        <td className="px-4 py-4 whitespace-nowrap" style={{ color: 'var(--app-text)' }}>{record.email}</td>
-                                        <td className="px-4 py-4 whitespace-nowrap">
-                                            <button onClick={() => handleEdit(record._id || record.id)} className="mr-2 rounded-lg text-lg px-2 py-1 font-bold transition-all" title="Edit"><FaEdit /></button>
-                                            <button onClick={() => handleDelete(record._id || record.id)} className="rounded-lg text-lg px-2 py-1 font-bold transition-all" title="Delete"><FaTrash /></button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {records.map((record) => {
+                                    const appointmentStatus = getAppointmentStatus(record);
+                                    return (
+                                        <tr key={record._id || record.id} onClick={() => window.location.href = `/patient/${record._id}`} className="transition-all hover:card-bg-hover cursor-pointer rounded-lg">
+                                            <td className="px-4 py-4 whitespace-nowrap" style={{ color: 'var(--app-text)' }}>{record.name}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap" style={{ color: 'var(--app-text)' }}>{record.age}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap" style={{ color: 'var(--app-text)' }}>{record.gender}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap" style={{ color: 'var(--app-text)' }}>{record.contactNumber}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap" style={{ color: 'var(--app-text)' }}>{record.email}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap">
+                                                {appointmentStatus && (
+                                                    <span className="px-2 py-1 rounded text-xs font-semibold" style={{
+                                                        background: appointmentStatus.type === 'overdue' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                                                        color: appointmentStatus.type === 'overdue' ? '#ef4444' : '#f59e0b',
+                                                        border: `1px solid ${appointmentStatus.type === 'overdue' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`
+                                                    }}>
+                                                        {appointmentStatus.type === 'overdue' ? `⚠️ Overdue ${appointmentStatus.days}d` : `📅 Due in ${appointmentStatus.days}d`}
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                                                <button onClick={() => handleEdit(record._id || record.id)} className="mr-2 rounded-lg text-lg px-2 py-1 font-bold transition-all" title="Edit"><FaEdit /></button>
+                                                <button onClick={() => handleDelete(record._id || record.id)} className="rounded-lg text-lg px-2 py-1 font-bold transition-all" title="Delete"><FaTrash /></button>
+                                                <button onClick={() => navigate(`/heart-risk/${record._id}`)} className="ml-2 rounded-lg text-lg px-2 py-1 font-bold transition-all" title="Calculate Heart Risk"><FaCalculator /></button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>

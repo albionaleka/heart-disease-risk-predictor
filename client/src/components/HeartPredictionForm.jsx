@@ -64,6 +64,7 @@ const HeartPredictionForm = () => {
       setResult({ probability: data.probability, label: data.label });
       if (patientId) {
         toast.success('Prediction saved! The new risk score has been updated and added to test history.');
+        window.dispatchEvent(new CustomEvent('checkupCompleted', { detail: { patientId } }));
         setTimeout(() => navigate(`/patient/${patientId}`), 2500);
       } else {
         toast.success('Prediction completed successfully!');

@@ -1,8 +1,9 @@
 import express from 'express';
-import { getPatientData, createPatient, getPatients, addHeartRiskScore, updatePatient, deletePatient } from '../controllers/patientController.js';
+import { getPatientData, createPatient, getPatients, addHeartRiskScore, updatePatient, deletePatient, getAppointmentNotifications } from '../controllers/patientController.js';
 
 const patientRouter = express.Router();
     
+patientRouter.get('/notifications', getAppointmentNotifications);
 patientRouter.get('/:patientId', getPatientData);
 patientRouter.get('/', getPatients);
 patientRouter.post('/', createPatient);

@@ -5,24 +5,62 @@ import { useContext, useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { ThemeContext } from "../context/ThemeContext";
+import { FaSun, FaMoon, FaBell } from "react-icons/fa";
 
 const Navbar = () => {
     const nav = useNavigate();
     const { userData, backend, setIsLoggedin, setUserData, refreshUserData } = useContext(AppContext);
     const { theme, toggleTheme } = useContext(ThemeContext);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+    const [notificationCount, setNotificationCount] = useState(0);
     const dropdownRef = useRef(null);
+    const notificationsRef = useRef(null);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setIsDropdownOpen(false);
             }
+            if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+                setIsNotificationsOpen(false);
+            }
         };
 
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            if (!userData) return;
+            try {
+                const res = await fetch(`${backend}/api/patient/notifications`);
+                const data = await res.json();
+                if (data.success) {
+                    setNotifications(data.notifications || []);
+                    setNotificationCount(data.count || 0);
+                }
+            } catch (err) {
+                console.error('Failed to fetch notifications:', err);
+            }
+        };
+
+        fetchNotifications();
+
+        const interval = setInterval(fetchNotifications, 5 * 60 * 1000);
+
+        const handleCheckupCompleted = () => {
+            fetchNotifications();
+        };
+        window.addEventListener('checkupCompleted', handleCheckupCompleted);
+        
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener('checkupCompleted', handleCheckupCompleted);
+        };
+    }, [userData, backend]);
 
     useEffect(() => {
         if (isDropdownOpen) {
@@ -76,12 +114,7 @@ const Navbar = () => {
                 <img src={reactLogo} alt="Logo" className="cursor-pointer h-[36px]" onClick={() => nav("/")} />
                 {userData && (
                     <nav className="hidden md:flex gap-4 items-center ml-8">
-                        <button 
-                            onClick={() => nav("/")} 
-                            className="text-sm hover:text-blue-400 transition-colors font-semibold"
-                            style={{ color: 'var(--app-text)' }}
-                        >Home</button>
-                        <button onClick={() => nav("/dashboard")} className="text-sm hover:text-blue-400 transition-colors font-semibold" style={{ color: 'var(--app-text)' }}>Dashboard</button>
+                        <button onClick={() => nav("/")} className="text-sm hover:text-blue-400 transition-colors font-semibold" style={{ color: 'var(--app-text)' }}>Dashboard</button>
                         <button onClick={() => nav("/patients")} className="text-sm hover:text-blue-400 transition-colors font-semibold" style={{ color: 'var(--app-text)' }}>Patients</button>
                     </nav>
                 )}
@@ -99,9 +132,81 @@ const Navbar = () => {
                   borderColor: 'var(--border-color)'
                 }}
               >
-                {theme === 'dark' ? '🌙' : '☀️'}
+                {theme === 'dark' ? <FaMoon /> : <FaSun />}
               </button>
-              { userData ? (
+              { userData && (
+                <div className="relative" ref={notificationsRef}>
+                  <button
+                    onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                    className="rounded-lg border h-10 w-10 flex items-center justify-center hover:brightness-110 transition-colors focus:outline-none relative"
+                    style={{
+                      background: 'var(--card-bg)',
+                      color: 'var(--app-text)',
+                      borderColor: 'var(--border-color)'
+                    }}
+                    title="Appointment Notifications"
+                  >
+                    <FaBell />
+                    {notificationCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center" style={{ fontSize: '10px' }}>
+                        {notificationCount > 9 ? '9+' : notificationCount}
+                      </span>
+                    )}
+                  </button>
+                  {isNotificationsOpen && (
+                    <div className="absolute right-0 mt-2 w-80 rounded-lg shadow-lg z-50 border max-h-96 overflow-y-auto"
+                      style={{ background: 'var(--card-bg)', borderColor: 'var(--card-border)' }}
+                    >
+                      <div className="p-3 border-b sticky top-0" style={{ background: 'var(--card-bg)', borderColor: 'var(--border-color)' }}>
+                        <h3 className="font-semibold text-sm" style={{ color: 'var(--app-text)' }}>Appointment Notifications</h3>
+                        <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{notificationCount} {notificationCount === 1 ? 'patient' : 'patients'} need attention</p>
+                      </div>
+                      <div className="py-1">
+                        {notifications.length === 0 ? (
+                          <div className="px-4 py-6 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
+                            No upcoming appointments
+                          </div>
+                        ) : (
+                          notifications.map((notif, index) => (
+                            <button
+                              key={index}
+                              onClick={() => {
+                                nav(`/patient/${notif.patientId}`);
+                                setIsNotificationsOpen(false);
+                              }}
+                              className="w-full text-left px-4 py-3 hover:brightness-110 transition-colors border-b"
+                              style={{ 
+                                borderColor: 'var(--border-color)',
+                                background: notif.isOverdue ? 'rgba(239, 68, 68, 0.05)' : 'transparent'
+                              }}
+                            >
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <p className="text-sm font-semibold" style={{ color: 'var(--app-text)' }}>{notif.patientName}</p>
+                                  <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{notif.patientEmail}</p>
+                                  <p className="text-xs mt-1" style={{ 
+                                    color: notif.isOverdue ? '#ef4444' : '#f59e0b',
+                                    fontWeight: '500'
+                                  }}>
+                                    {notif.isOverdue 
+                                      ? `⚠️ Overdue by ${Math.abs(notif.daysUntil)} day${Math.abs(notif.daysUntil) !== 1 ? 's' : ''}`
+                                      : `📅 Appointment in ${notif.daysUntil} day${notif.daysUntil !== 1 ? 's' : ''}`
+                                    }
+                                  </p>
+                                </div>
+                                <div className="text-xs ml-2" style={{ color: 'var(--text-muted)' }}>
+                                  {new Date(notif.nextAppointment).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                </div>
+                              </div>
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            { userData ? (
                 <div className="relative" ref={dropdownRef} >
                     <button 
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -141,16 +246,16 @@ const Navbar = () => {
                         </div>
                     )}
                 </div>
-              ) : (
+            ) : (
                 <button 
                     onClick={() => nav("/login")} 
                     className="rounded-lg px-6 py-2 font-semibold text-sm hover:brightness-110 transition-colors"
                     style={{background:'var(--accent)', color:'#fff'}}>
                     Login
                 </button>
-              )}
+            )}
             </div>
-        </div>
+        </div> 
     )
 }
 

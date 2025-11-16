@@ -34,7 +34,8 @@ export const predictHeartRisk = async (req, res) => {
 
         await Patient.findByIdAndUpdate(patientId, { 
           heartRiskScore: data.probability,
-          heartRiskLabel: data.label
+          heartRiskLabel: data.label,
+          lastCheckup: new Date()
         });
       } else {
         const predictionData = {
@@ -293,5 +294,17 @@ export const getPatientPredictionHistory = async (req, res) => {
     });
   }
 };
+
+export const getTestById = async (req, res) => {
+  try {
+    const { testId } = req.params;
+    if (!testId) return res.status(400).json({ success: false, message: 'Test ID is required' });
+    const test = await Test.findById(testId);
+    if (!test) return res.status(404).json({ success: false, message: 'Test not found' });
+    return res.json({ success: true, test });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
 
 export default { predictHeartRisk, getDashboardStats, getPatientPredictionHistory };

@@ -19,17 +19,16 @@ export const getPatientData = async (req, res) => {
             return res.status(404).json({ success: false, message: "Patient not found" });
         }
 
-        // Get test history for this patient from Test collection
         const testHistory = await Test.find({ patientId })
             .sort({ createdAt: -1 })
             .select('-__v')
-            .limit(10); // Get last 10 tests
+            .limit(10);
 
         return res.json({ 
             success: true, 
             patientData: patient,
             testHistory: testHistory || [],
-            predictionHistory: testHistory || [] // Keep for backward compatibility
+            predictionHistory: testHistory || []
         });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
@@ -101,11 +100,62 @@ export const addHeartRiskScore = async (patientId, score) => {
     }
 };
 
+export const getAppointmentNotifications = async (req, res) => {
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const threeDaysFromNow = new Date(today);
+        threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
+
+        const highRiskPatients = await Patient.find({
+            heartRiskScore: { $gte: 0.5 },
+            lastCheckup: { $ne: null }
+        });
+
+        const notifications = [];
+        
+        highRiskPatients.forEach(patient => {
+            if (!patient.lastCheckup) return;
+            
+            const lastCheckup = new Date(patient.lastCheckup);
+            const nextAppointment = new Date(lastCheckup);
+            nextAppointment.setDate(nextAppointment.getDate() + 28); 
+
+            if (nextAppointment <= threeDaysFromNow) {
+                const daysUntil = Math.ceil((nextAppointment - today) / (1000 * 60 * 60 * 24));
+                const daysSinceCheckup = Math.floor((today - lastCheckup) / (1000 * 60 * 60 * 24));
+                if (daysSinceCheckup < 25) return;
+                
+                notifications.push({
+                    patientId: patient._id,
+                    patientName: patient.name,
+                    patientEmail: patient.email,
+                    nextAppointment: nextAppointment,
+                    daysUntil: daysUntil,
+                    isOverdue: daysUntil < 0,
+                    lastCheckup: patient.lastCheckup
+                });
+            }
+        });
+
+        notifications.sort((a, b) => {
+            if (a.isOverdue && !b.isOverdue) return -1;
+            if (!a.isOverdue && b.isOverdue) return 1;
+            return a.daysUntil - b.daysUntil;
+        });
+
+        return res.json({ success: true, notifications, count: notifications.length });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 export default {
     getPatientData,
     createPatient,
     updatePatient,
     addHeartRiskScore,
     deletePatient,
-    getPatients
+    getPatients,
+    getAppointmentNotifications
 };

@@ -80,6 +80,20 @@ const Patient = ({ onDelete }) => {
 		}
 	};
 
+	// Calculate appointment notification for high-risk patients
+	const getAppointmentInfo = () => {
+		if (!patient || patient.heartRiskScore < 0.5 || !patient.lastCheckup) return null;
+		const lastCheckup = new Date(patient.lastCheckup);
+		const nextAppointment = new Date(lastCheckup);
+		nextAppointment.setDate(nextAppointment.getDate() + 28); // 4 weeks = 28 days
+		const today = new Date();
+		const daysUntil = Math.ceil((nextAppointment - today) / (1000 * 60 * 60 * 24));
+		const isOverdue = daysUntil < 0;
+		return { nextAppointment, daysUntil, isOverdue };
+	};
+
+	const appointmentInfo = getAppointmentInfo();
+
 	if (loading) return <div className="text-center p-6">Loading patient...</div>;
 	if (!patient) return <div className="text-center p-6" style={{ color: 'var(--text-muted)' }}>No patient selected</div>;
 
@@ -107,7 +121,37 @@ const Patient = ({ onDelete }) => {
 								<div className="font-medium" style={{ color: 'var(--text-secondary)' }}>Address</div>
 								<div>{patient.address}</div>
 							</div>
+							{patient.lastCheckup && (
+								<div>
+									<div className="font-medium" style={{ color: 'var(--text-secondary)' }}>Last Checkup</div>
+									<div>{new Date(patient.lastCheckup).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</div>
+								</div>
+							)}
+							{appointmentInfo && (
+								<div>
+									<div className="font-medium" style={{ color: 'var(--text-secondary)' }}>Next Appointment</div>
+									<div style={{ color: appointmentInfo.isOverdue ? '#ef4444' : appointmentInfo.daysUntil <= 7 ? '#f59e0b' : 'var(--app-text)' }}>
+										{appointmentInfo.nextAppointment.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+										{appointmentInfo.isOverdue && <span className="ml-2 text-xs font-semibold">(Overdue)</span>}
+										{!appointmentInfo.isOverdue && appointmentInfo.daysUntil <= 7 && <span className="ml-2 text-xs font-semibold">({appointmentInfo.daysUntil} days)</span>}
+									</div>
+								</div>
+							)}
 						</div>
+						{appointmentInfo && appointmentInfo.isOverdue && (
+							<div className="mt-4 p-3 rounded-lg" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+								<p className="text-sm font-semibold" style={{ color: '#ef4444' }}>
+									⚠️ Appointment Overdue: This high-risk patient is due for a checkup. Please schedule an appointment.
+								</p>
+							</div>
+						)}
+						{appointmentInfo && !appointmentInfo.isOverdue && appointmentInfo.daysUntil <= 7 && (
+							<div className="mt-4 p-3 rounded-lg" style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+								<p className="text-sm font-semibold" style={{ color: '#f59e0b' }}>
+									📅 Appointment Reminder: Next checkup in {appointmentInfo.daysUntil} day{appointmentInfo.daysUntil !== 1 ? 's' : ''}.
+								</p>
+							</div>
+						)}
 					</div>
 					<div className="flex flex-col items-end gap-4">
 						<div className="flex gap-2">
@@ -159,7 +203,14 @@ const Patient = ({ onDelete }) => {
 									const riskPercent = (pred.probability * 100).toFixed(1);
 									const isHighRisk = pred.probability >= 0.5;
 									return (
-										<tr key={pred._id || index} className="hover:card-bg-hover transition-colors" style={{ borderBottom: '1px solid var(--border-color)' }}>
+										<tr
+											key={pred._id || index}
+											className="hover:card-bg-hover transition-colors cursor-pointer"
+											style={{ borderBottom: '1px solid var(--border-color)' }}
+											onClick={() => nav(`/test/${pred._id}`)}
+											tabIndex={0}
+											aria-label="View test details"
+										>
 											<td className="px-4 py-2 text-sm" style={{ color: 'var(--app-text)' }}>{date}</td>
 											<td className="px-4 py-2">
 												<span className="font-semibold" style={{ color: isHighRisk ? '#ef4444' : '#22d3ee' }}>{riskPercent}%</span>
