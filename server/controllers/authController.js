@@ -36,13 +36,17 @@ export const register = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
-        await transporter.sendMail({
-            from: process.env.SENDER_EMAIL,
-            to: email,
-            subject: "Welcome to Authentication ✔",
-            text: `Welcome to our app. Your account has been created with email: ${email}`,
-            html: `<b>Welcome to our app. Your account has been created with email: ${email}</b>`
-        });
+        try {
+            await transporter.sendMail({
+                from: process.env.SENDER_EMAIL,
+                to: email,
+                subject: "Welcome to Authentication ✔",
+                text: `Welcome to our app. Your account has been created with email: ${email}`,
+                html: `<b>Welcome to our app. Your account has been created with email: ${email}</b>`
+            });
+        } catch (emailError) {
+            console.error("Failed to send welcome email:", emailError.message);
+        }
 
         return res.status(201).json({ success: true, message: "User registered successfully" });
     } catch (error) {
@@ -128,7 +132,7 @@ export const sendVerifyOtp = async (req, res) => {
 
         return res.json({ success: true, message: "Verification OTP Sent"});
     } catch (error) {
-        res.json({ success: false, message: error.message });
+        return res.json({ success: false, message: error.message });
     } 
 }
 
@@ -256,7 +260,7 @@ export const resetPassword = async (req, res) => {
         user.password = await bcrypt.hash(newPassword, 10);
         user.resetOTP = '';
         user.resetOTPExpire = 0;
-        user.save();
+        await user.save();
         return res.json({ success: true, message: "Password has been reset"})
     } catch (error) {
         return res.json({ success: false, message: error.message });
