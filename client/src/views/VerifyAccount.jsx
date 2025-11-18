@@ -62,7 +62,7 @@ const VerifyAccount = () => {
 
     return (
         <div className="bg-slate-800 flex flex-col items-center justify-center min-h-screen px-0 md:px-6">
-            <FaHome onClick={() => nav("/")} className="absolute left-5 h-7 text-violet-500 hover:text-violet-600 sm:left-20 top-5 w-28 sm:w-32 cursor-pointer" />
+            <FaHome onClick={() => nav("/")} className="absolute left-5 h-7 sm:left-20 top-5 w-28 sm:w-32 cursor-pointer transition-colors" style={{color: 'var(--accent)'}} onMouseEnter={e => e.currentTarget.style.color = 'var(--accent-hover)'} onMouseLeave={e => e.currentTarget.style.color = 'var(--accent)'} />
 
             <form onSubmit={handleSubmit} className="bg-slate-900 p-8 rounded-lg shadow-lg w-96 text-sm px-4 mx-2">
                 <h1 className="text-3xl text-white">Verification Code</h1>
@@ -76,7 +76,7 @@ const VerifyAccount = () => {
                 </div>
 
                 <div className="w-full flex items-center justify-center">
-                    <button type="submit" className="rounded-lg bg-violet-500 text-white text-lg px-4 py-2">Verify</button>
+                    <button type="submit" className="rounded-lg text-white text-lg px-4 py-2 transition-colors" style={{background: 'var(--accent)'}} onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-hover)'} onMouseLeave={e => e.currentTarget.style.background = 'var(--accent)'}>Verify</button>
                 </div>
             </form>
         </div>

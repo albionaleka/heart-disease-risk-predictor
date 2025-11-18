@@ -45,8 +45,13 @@ const AppContextProvider = (props) => {
             if (data.success) {
                 setUserData(data.userData || data.user);
                 setIsLoggedin(true);
+            } else {
+                setIsLoggedin(false);
+                setUserData(null);
             }
         } catch (error) {
+            setIsLoggedin(false);
+            setUserData(null);
             if (error.response?.status !== 401) {
                 console.error("Auth check failed:", error.message);
             }

@@ -54,7 +54,6 @@ const Dashboard = () => {
   if (filter === 'low') filtered = lowRisk;
   if (filter === 'no') filtered = noScore;
 
-  // Prepare data for charts
   const riskDistributionData = stats ? [
     { name: 'High Risk', value: stats.riskLevels.high, percent: stats.riskLevels.highPercent || 0 },
     { name: 'Low Risk', value: stats.riskLevels.low, percent: stats.riskLevels.lowPercent || 0 }
@@ -73,11 +72,9 @@ const Dashboard = () => {
 
   const COLORS = ['#ef4444', '#10b981'];
 
-  // Theme-aware chart styling
   const chartTextColor = 'var(--app-text)';
   const chartGridColor = 'var(--border-color)';
   
-  // Custom tooltip style
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
@@ -94,7 +91,6 @@ const Dashboard = () => {
     return null;
   };
 
-  // Prepare correlation heatmap data
   const getCorrelationData = () => {
     if (!stats || !stats.correlationMatrix || stats.correlationMatrix.length === 0) {
       return { matrix: [], features: [] };
@@ -131,7 +127,6 @@ const Dashboard = () => {
 
   const correlationData = getCorrelationData();
 
-  // Prepare cholesterol boxplot data
   const getCholesterolStats = () => {
     if (!stats || !stats.cholesterolDistribution || stats.cholesterolDistribution.length === 0) {
       return null;
@@ -152,7 +147,6 @@ const Dashboard = () => {
 
   const cholesterolStats = getCholesterolStats();
 
-  // Mock ROC curve data (in production, this would come from model evaluation)
   const rocData = [
     { fpr: 0, tpr: 0 },
     { fpr: 0.1, tpr: 0.3 },
@@ -171,7 +165,6 @@ const Dashboard = () => {
     <div className="max-w-7xl mx-auto px-6 mt-8 pb-8">
       <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 
-      {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
         <div className="p-6 card text-center">
           <div className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>Total Predictions</div>
@@ -201,7 +194,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Average Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
         <div className="p-6 card text-center">
           <div className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>Average Age</div>
@@ -225,7 +217,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Gender Breakdown */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
         <div className="p-6 card">
           <h3 className="text-lg font-semibold mb-4">Gender Breakdown</h3>
@@ -253,7 +244,7 @@ const Dashboard = () => {
 
         <div className="p-6 card">
           <h3 className="text-lg font-semibold mb-4">Most Common Chest Pain Type</h3>
-          <div className="text-2xl font-bold text-violet-500">
+          <div className="text-2xl font-bold" style={{color: 'var(--accent)'}}>
             {statsLoading ? "..." : 
               (stats?.mostCommonChestPain !== undefined 
                 ? chestPainLabels[stats.mostCommonChestPain] || `Type ${stats.mostCommonChestPain}`
@@ -262,7 +253,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Model Metrics */}
       <div className="p-6 card mb-8">
         <h3 className="text-lg font-semibold mb-4">Model Metrics</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -280,16 +270,14 @@ const Dashboard = () => {
           </div>
           <div className="text-center">
             <div className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>AUC</div>
-            <div className="text-2xl font-bold text-purple-500">
+            <div className="text-2xl font-bold" style={{color: 'var(--accent-secondary)'}}>
               {statsLoading ? "..." : (stats?.modelMetrics.auc?.toFixed(2) || 0)}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Risk Distribution Pie Chart */}
         <div className="p-6 card">
           <h3 className="text-lg font-semibold mb-4">Risk Distribution</h3>
           {statsLoading || !stats ? (
@@ -317,7 +305,6 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Age Histogram */}
         <div className="p-6 card">
           <h3 className="text-lg font-semibold mb-4">Age Distribution</h3>
           {statsLoading || !stats ? (
@@ -335,7 +322,6 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Gender vs Disease Bar Chart */}
         <div className="p-6 card">
           <h3 className="text-lg font-semibold mb-4">Gender vs Disease</h3>
           {statsLoading || !stats ? (
@@ -355,7 +341,6 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Chest Pain Type Bar Chart */}
         <div className="p-6 card">
           <h3 className="text-lg font-semibold mb-4">Chest Pain Type Distribution</h3>
           {statsLoading || !stats ? (
@@ -373,7 +358,6 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Feature Importance Bar Chart */}
         <div className="p-6 card">
           <h3 className="text-lg font-semibold mb-4">Feature Importance</h3>
           {statsLoading || !stats ? (
@@ -391,7 +375,6 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* ROC Curve */}
         <div className="p-6 card">
           <h3 className="text-lg font-semibold mb-4">ROC Curve</h3>
           <div className="h-64">
@@ -424,7 +407,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Correlation Heatmap */}
       <div className="p-6 card mb-8">
         <h3 className="text-lg font-semibold mb-4">Feature Correlation Heatmap</h3>
         {statsLoading || !stats || !correlationData.matrix || correlationData.matrix.length === 0 ? (
@@ -474,14 +456,12 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* Cholesterol Boxplot */}
       {cholesterolStats && (
         <div className="p-6 card mb-8">
           <h3 className="text-lg font-semibold mb-4">Cholesterol Distribution (Boxplot)</h3>
           <div className="relative h-32">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full relative h-16">
-                {/* Whiskers */}
                 <div 
                   className="absolute left-0 top-1/2 h-0.5" 
                   style={{ 
@@ -497,7 +477,6 @@ const Dashboard = () => {
                   }}
                 ></div>
                 
-                {/* Box */}
                 <div 
                   className="absolute border-2 h-16"
                   style={{
@@ -507,7 +486,6 @@ const Dashboard = () => {
                     backgroundColor: 'rgba(59, 130, 246, 0.2)'
                   }}
                 >
-                  {/* Median line */}
                   <div 
                     className="absolute top-0 bottom-0 w-0.5"
                     style={{
@@ -529,7 +507,6 @@ const Dashboard = () => {
       </div>
       )}
 
-      {/* Patient Table Section */}
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-4">Patient Records</h2>
       <div className="flex gap-2 mb-2">

@@ -1,7 +1,7 @@
 import { useContext, useRef, useState } from "react";
-import { FaEye, FaHome, FaLock } from "react-icons/fa"
+import { FaEye, FaLock } from "react-icons/fa"
 import { IoMdMail } from "react-icons/io";
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -87,8 +87,6 @@ const ResetPassword = () => {
 
     return (
         <div className="bg-slate-800 flex flex-col items-center justify-center min-h-screen px-0 md:px-6">
-            <FaHome onClick={() => nav("/")} className="absolute left-5 h-7 text-violet-500 hover:text-violet-600 sm:left-20 top-5 w-28 sm:w-32 cursor-pointer" />
-
             {!emailSent &&
                 <form onSubmit={sendOTP} className="bg-slate-900 p-8 rounded-lg shadow-lg w-96 text-sm px-4 mx-2 text-indigo-300">
                     <h1 className="text-2xl text-white font-semibold text-center mb-2">Reset Password</h1>
@@ -101,7 +99,7 @@ const ResetPassword = () => {
                     </div>
 
                     <div className="flex items-center justify-center">
-                        <button className="bg-violet-500 hover:bg-violet-600 text-white rounded-lg py-2 px-4">Submit</button>
+                        <button className="text-white rounded-lg py-2 px-4 transition-colors" style={{background: 'var(--accent)'}} onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-hover)'} onMouseLeave={e => e.currentTarget.style.background = 'var(--accent)'}>Submit</button>
                     </div>
                 </form>}
             
@@ -118,7 +116,7 @@ const ResetPassword = () => {
                     </div>
 
                     <div className="flex items-center justify-center">
-                        <button className="bg-violet-500 hover:bg-violet-600 text-white rounded-lg py-2 px-4">Submit</button>
+                        <button className="text-white rounded-lg py-2 px-4 transition-colors" style={{background: 'var(--accent)'}} onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-hover)'} onMouseLeave={e => e.currentTarget.style.background = 'var(--accent)'}>Submit</button>
                     </div>
                 </form>}
             
@@ -134,9 +132,12 @@ const ResetPassword = () => {
                     </div>
 
                     <div className="flex items-center justify-center">
-                        <button className="bg-violet-500 hover:bg-violet-600 text-white rounded-lg py-2 px-4">Reset</button>
+                        <button className="text-white rounded-lg py-2 px-4 transition-colors" style={{background: 'var(--accent)'}} onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-hover)'} onMouseLeave={e => e.currentTarget.style.background = 'var(--accent)'}>Reset</button>
                     </div>
-                </form>}     
+                </form>
+            }
+
+            <p className="text-slate-400 text-center mt-4">Already have an account? <Link to="/login" className="cursor-pointer underline transition-colors" style={{color: 'var(--accent)'}} onMouseEnter={e => e.currentTarget.style.color = 'var(--accent-hover)'} onMouseLeave={e => e.currentTarget.style.color = 'var(--accent)'}>Login</Link></p>     
         </div>
     )
 }

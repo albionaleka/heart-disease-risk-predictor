@@ -13,8 +13,10 @@
   --card-border: rgba(15,23,42,0.06);
   --border-color: rgba(15,23,42,0.06);
   --navbar-height: 64px;
-  --accent: #8b5cf6;
-  --accent-hover: #7c3aed;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-secondary: #10b981;
+  --accent-secondary-hover: #059669;
   --card-shadow: 0 2px 16px 0 rgba(0,0,0,0.04);
   --text-secondary: rgba(15,23,42,0.6);
   --text-muted: rgba(15,23,42,0.4);
@@ -28,8 +30,10 @@
   --card-bg-hover: #1a2230;
   --card-border: rgba(255,255,255,0.06);
   --border-color: rgba(255,255,255,0.06);
-  --accent: #a78bfa;
-  --accent-hover: #c4b5fd;
+  --accent: #3b82f6;
+  --accent-hover: #60a5fa;
+  --accent-secondary: #34d399;
+  --accent-secondary-hover: #10b981;
   --card-shadow: 0 2px 16px 0 rgba(0,0,0,0.23);
   --text-secondary: rgba(230,238,248,0.7);
   --text-muted: rgba(230,238,248,0.5);

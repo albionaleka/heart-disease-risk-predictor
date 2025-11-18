@@ -1,5 +1,5 @@
-import { useEffect, useContext, useState } from "react";
-import { FaUser, FaLock, FaEye, FaHome } from "react-icons/fa";
+import { useContext, useState } from "react";
+import { FaUser, FaLock, FaEye } from "react-icons/fa";
 import { IoMdMail } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
@@ -7,9 +7,9 @@ import axios from 'axios';
 import {toast} from 'react-toastify';
 
 const Login = () => {
-    const [action, setAction] = useState('Register');
+    const [action, setAction] = useState('Login');
 
-    const {backend, setIsLoggedin, getData, isLoggedin} = useContext(AppContext);
+    const {backend, getAuth} = useContext(AppContext);
 
     const [formData, setFormData] = useState(() => {
         return {
@@ -47,8 +47,7 @@ const Login = () => {
                     });
 
                     if (data.success) {
-                        setIsLoggedin(true);
-                        getData();
+                        await getAuth();
                         nav("/");
                     } else {
                         toast.error(data.message);
@@ -63,31 +62,22 @@ const Login = () => {
                 });
 
                 if (data.success) {
-                    setIsLoggedin(true);
-                    getData();
+                    await getAuth();
                     nav("/");
                 } else {
                     toast.error("Couldn't log you in");
                 }
             }
         } catch (error) {
-            toast.error(error.message);
+            const errorMessage = error.response?.data?.message || error.message || "An error occurred";
+            toast.error(errorMessage);
         }
     }
 
-    useEffect(() => {
-        if (isLoggedin) {
-            getData();
-            nav("/");
-        }
-    }, [isLoggedin])
-
     return (
         <div className="bg-slate-800 flex flex-col items-center justify-center min-h-screen px-0 md:px-6">
-            <FaHome onClick={() => nav("/")} className="absolute left-5 h-7 text-violet-500 hover:text-violet-600 sm:left-20 top-5 w-28 sm:w-32 cursor-pointer" />
-
             <div className="bg-slate-900 p-10 rounded-lg shadow-lg w-full md:w-96 text-indigo-300">
-                <h2 className="text-3xl text-center font-semibold mb-6">{action === "Register" ? "Register" : "Log in"}</h2>
+                <h2 className="text-3xl text-center font-semibold mb-6">{action === "Login" ? "Login" : "Register"}</h2>
 
                 <form onSubmit={handleSubmit} className="mb-3">
                     {action === "Register" && (
@@ -121,14 +111,14 @@ const Login = () => {
                     )} 
                     
                     {action === "Login" && 
-                        <p onClick={() => nav("/reset")} className="mb-4 text-indigo-400 cursor-pointer">Forgot Password?</p>}
+                        <p onClick={() => nav("/reset")} className="mb-4 cursor-pointer transition-colors" style={{color: 'var(--accent)'}} onMouseEnter={e => e.currentTarget.style.color = 'var(--accent-hover)'} onMouseLeave={e => e.currentTarget.style.color = 'var(--accent)'}>Forgot Password?</p>}
 
-                    <button className="w-full py-2 rounded-lg bg-violet-500 hover:bg-violet-600 text-white">{action === "Register" ? "Signup": "Log in"}</button>
+                    <button className="w-full py-2 rounded-lg text-white transition-colors" style={{background: 'var(--accent)'}} onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-hover)'} onMouseLeave={e => e.currentTarget.style.background = 'var(--accent)'}>{action === "Register" ? "Signup": "Log in"}</button>
                 </form>
                     
                 {action === "Register" 
-                    ? <p>Already have an account? <span onClick={() => setAction("Login")} className="text-violet-500 cursor-pointer underline">Login</span></p>
-                    : <p>Don't have an account? <span onClick={() => setAction("Register")} className="text-violet-500 cursor-pointer underline">Sign up</span></p>
+                    ? <p>Already have an account? <span onClick={() => setAction("Login")} className="cursor-pointer underline transition-colors" style={{color: 'var(--accent)'}} onMouseEnter={e => e.currentTarget.style.color = 'var(--accent-hover)'} onMouseLeave={e => e.currentTarget.style.color = 'var(--accent)'}>Login</span></p>
+                    : <p>Don't have an account? <span onClick={() => setAction("Register")} className="cursor-pointer underline transition-colors" style={{color: 'var(--accent)'}} onMouseEnter={e => e.currentTarget.style.color = 'var(--accent-hover)'} onMouseLeave={e => e.currentTarget.style.color = 'var(--accent)'}>Sign up</span></p>
                 }
             </div>
         </div>

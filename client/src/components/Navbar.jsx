@@ -1,22 +1,24 @@
 import { useNavigate } from "react-router-dom";
-import reactLogo from "../assets/react.svg";
+import appLogo from "../assets/logo.webp";
 import { AppContext } from "../context/AppContext";
 import { useContext, useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { ThemeContext } from "../context/ThemeContext";
-import { FaSun, FaMoon, FaBell } from "react-icons/fa";
+import { FaSun, FaMoon, FaBell, FaBars } from "react-icons/fa";
 
 const Navbar = () => {
     const nav = useNavigate();
     const { userData, backend, setIsLoggedin, setUserData, refreshUserData } = useContext(AppContext);
     const { theme, toggleTheme } = useContext(ThemeContext);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [notificationCount, setNotificationCount] = useState(0);
     const dropdownRef = useRef(null);
     const notificationsRef = useRef(null);
+    const mobileMenuRef = useRef(null);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -25,6 +27,9 @@ const Navbar = () => {
             }
             if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
                 setIsNotificationsOpen(false);
+            }
+            if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
+                setIsMobileMenuOpen(false);
             }
         };
 
@@ -66,7 +71,7 @@ const Navbar = () => {
         if (isDropdownOpen) {
             refreshUserData();
         }
-    }, [isDropdownOpen]);
+    }, [isDropdownOpen, refreshUserData]);
 
     const sendVerifyOTP = async () => {
         try {
@@ -111,7 +116,7 @@ const Navbar = () => {
             style={{ background: 'var(--card-bg)', borderBottom: '1px solid var(--card-border)', color: 'var(--app-text)' }}
         >
             <div className="flex items-center gap-4 h-full">
-                <img src={reactLogo} alt="Logo" className="cursor-pointer h-[36px]" onClick={() => nav("/")} />
+                <img src={appLogo} alt="Logo" className="cursor-pointer h-[45px]" onClick={() => nav("/")} />
                 {userData && (
                     <nav className="hidden md:flex gap-4 items-center ml-8">
                         <button onClick={() => nav("/")} className="text-sm hover:text-blue-400 transition-colors font-semibold" style={{ color: 'var(--app-text)' }}>Dashboard</button>
@@ -206,12 +211,60 @@ const Navbar = () => {
                   )}
                 </div>
               )}
+            { userData && (
+                <div className="relative md:hidden" ref={mobileMenuRef}>
+                    <button
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className="w-10 h-10 flex items-center justify-center border rounded-lg p-2 hover:brightness-110 transition-colors text-xl"
+                        style={{ background: 'var(--card-bg)', color: 'var(--app-text)', borderColor: 'var(--border-color)' }}
+                        aria-label="Open menu"
+                        title="Menu"
+                    >
+                        <FaBars />
+                    </button>
+                    {isMobileMenuOpen && (
+                        <div className="absolute right-0 mt-2 w-44 rounded-lg shadow-lg z-50 border"
+                          style={{ background: 'var(--card-bg)', borderColor: 'var(--card-border)' }}
+                        >
+                            <div className="py-1 flex flex-col">
+                                <button
+                                    onClick={() => {
+                                        nav("/");
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm hover:brightness-110 transition-colors"
+                                    style={{ color: 'var(--app-text)', borderColor: 'var(--border-color)' }}
+                                >Dashboard</button>
+                                <button
+                                    onClick={() => {
+                                        nav("/patients");
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm hover:brightness-110 transition-colors"
+                                    style={{ color: 'var(--app-text)' }}
+                                >Patients</button>
+                                <div className="border-t my-1" style={{ borderColor: 'var(--border-color)' }}></div>
+                                <button 
+                                    onClick={() => {
+                                        logout();
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm hover:bg-red-100 hover:dark:bg-red-900 transition-colors"
+                                    style={{color:'#ef4444'}}
+                                >Logout</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
             { userData ? (
-                <div className="relative" ref={dropdownRef} >
+                <div className="relative hidden md:block" ref={dropdownRef} >
                     <button 
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                         className="w-10 h-10 flex items-center justify-center border rounded-full p-2 hover:brightness-110 transition-colors font-bold text-lg"
                         style={{ background: 'var(--card-bg)', color: 'var(--app-text)', borderColor: 'var(--border-color)' }}
+                        aria-label="Profile menu"
+                        title="Profile"
                     >
                         {userData.name[0].toUpperCase()}
                     </button>
