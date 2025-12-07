@@ -40,7 +40,7 @@ export const register = async (req, res) => {
             await transporter.sendMail({
                 from: process.env.SENDER_EMAIL,
                 to: email,
-                subject: "Welcome to Authentication ✔",
+                subject: "Welcome to the Heart Disease Predictor ✔",
                 text: `Welcome to our app. Your account has been created with email: ${email}`,
                 html: `<b>Welcome to our app. Your account has been created with email: ${email}</b>`
             });
