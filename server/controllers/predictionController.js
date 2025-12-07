@@ -5,7 +5,8 @@ import Patient from "../models/patient.js";
 
 export const predictHeartRisk = async (req, res) => {
   try {
-    const { data } = await axios.post("http://localhost:8000/predict", req.body);
+    const predictionApiUrl = process.env.PREDICTION_API_URL || "http://localhost:8000";
+    const { data } = await axios.post(`${predictionApiUrl}/predict`, req.body);
 
     if (data.probability !== undefined && data.label !== undefined) {
       const patientId = req.body.patientId || null;
@@ -32,7 +33,7 @@ export const predictHeartRisk = async (req, res) => {
 
         await Test.create(testData);
 
-        await Patient.findByIdAndUpdate(patientId, { 
+        await Patient.findByIdAndUpdate(patientId, {
           heartRiskScore: data.probability,
           heartRiskLabel: data.label,
           lastCheckup: new Date()
@@ -74,7 +75,7 @@ export const predictHeartRisk = async (req, res) => {
 export const getDashboardStats = async (req, res) => {
   try {
     const patients = await Patient.find({ heartRiskScore: { $ne: null } });
-    
+
     if (patients.length === 0) {
       return res.json({
         success: true,
@@ -112,16 +113,18 @@ export const getDashboardStats = async (req, res) => {
 
     const patientIds = patients.map(p => p._id);
     let latestTests = [];
-    
+
     if (patientIds.length > 0) {
       try {
         latestTests = await Test.aggregate([
           { $match: { patientId: { $in: patientIds } } },
           { $sort: { createdAt: -1 } },
-          { $group: {
-            _id: "$patientId",
-            latestTest: { $first: "$$ROOT" }
-          }},
+          {
+            $group: {
+              _id: "$patientId",
+              latestTest: { $first: "$$ROOT" }
+            }
+          },
           { $replaceRoot: { newRoot: "$latestTest" } }
         ]);
       } catch (err) {
@@ -136,8 +139,8 @@ export const getDashboardStats = async (req, res) => {
     const lowRisk = patients.filter(p => p.heartRiskScore < 0.5).length;
 
     const testsWithData = latestTests.filter(t => t !== null && t !== undefined);
-    const avgAge = testsWithData.length > 0 
-      ? testsWithData.reduce((sum, t) => sum + t.age, 0) / testsWithData.length 
+    const avgAge = testsWithData.length > 0
+      ? testsWithData.reduce((sum, t) => sum + t.age, 0) / testsWithData.length
       : patients.reduce((sum, p) => sum + p.age, 0) / patients.length;
     const avgChol = testsWithData.length > 0
       ? testsWithData.reduce((sum, t) => sum + t.chol, 0) / testsWithData.length
@@ -188,10 +191,10 @@ export const getDashboardStats = async (req, res) => {
       const sumXY = x.reduce((sum, xi, i) => sum + xi * y[i], 0);
       const sumX2 = x.reduce((sum, xi) => sum + xi * xi, 0);
       const sumY2 = y.reduce((sum, yi) => sum + yi * yi, 0);
-      
+
       const numerator = n * sumXY - sumX * sumY;
       const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
-      
+
       return denominator === 0 ? 0 : numerator / denominator;
     };
 
@@ -213,13 +216,13 @@ export const getDashboardStats = async (req, res) => {
 
     const featureNames = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak', 'probability'];
     const correlationMatrix = numericFeatures.age.length > 0
-      ? featureNames.map(f1 => 
-          featureNames.map(f2 => ({
-            x: f1,
-            y: f2,
-            value: calculateCorrelation(numericFeatures[f1], numericFeatures[f2])
-          }))
-        ).flat()
+      ? featureNames.map(f1 =>
+        featureNames.map(f2 => ({
+          x: f1,
+          y: f2,
+          value: calculateCorrelation(numericFeatures[f1], numericFeatures[f2])
+        }))
+      ).flat()
       : [];
 
     const cholesterolValues = testsWithData.map(t => t.chol).sort((a, b) => a - b);
@@ -268,7 +271,7 @@ export const getDashboardStats = async (req, res) => {
 export const getPatientPredictionHistory = async (req, res) => {
   try {
     const { patientId } = req.params;
-    
+
     if (!patientId) {
       return res.status(400).json({
         success: false,
