@@ -53,8 +53,8 @@ const PatientForm = () => {
     };
 
     return (
-        <div className="w-full flex items-center flex-col">
-                <div className="mb-3 w-full md:w-2/3 mx-auto p-6 shadow rounded-lg" style={{ background: 'var(--card-bg)', color: 'var(--app-text)' }}>
+        <div className="w-full p-4 flex items-center flex-col mt-4">
+            <div className="mb-3 w-full md:w-2/3 mx-auto p-6 shadow rounded-lg" style={{ background: 'var(--card-bg)', color: 'var(--app-text)' }}>
                 <h2 className="text-2xl font-bold mb-4">Patient Form</h2>
 
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -146,7 +146,7 @@ const PatientForm = () => {
                     <div className="col-span-1 md:col-span-2">
                         <button
                             type="submit"
-                            className="w-full rounded-lg font-bold py-2 px-4 shadow card transition-all mt-2" style={{background:'var(--accent)', color:'#fff'}} onMouseEnter={e=>e.currentTarget.style.background='var(--accent-hover)'} onMouseLeave={e=>e.currentTarget.style.background='var(--accent)'}>Submit</button>
+                            className="w-full rounded-lg font-bold py-2 px-4 shadow card transition-all mt-2" style={{ background: 'var(--accent)', color: '#fff' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-hover)'} onMouseLeave={e => e.currentTarget.style.background = 'var(--accent)'}>Submit</button>
                     </div>
                 </form>
             </div>

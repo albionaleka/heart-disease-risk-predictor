@@ -52,7 +52,7 @@ const TestDetail = () => {
     return <div className="flex justify-center p-6 text-red-500 font-semibold">{error ? error : 'Test data could not be retrieved.'}</div>;
 
   return (
-    <div className="w-full flex items-center flex-col">
+    <div className="w-full flex items-center flex-col p-4">
       <div className="w-full md:w-2/3 mx-auto p-6 shadow rounded-lg mt-6" style={{ background: 'var(--card-bg)', color: 'var(--app-text)' }}>
         <h2 className="text-2xl font-bold mb-4">Test Details</h2>
         <table className="min-w-full text-left">

@@ -48,7 +48,7 @@ const HeartPredictionForm = () => {
       const apiForm = { ...form };
       apiForm.age = Number(form.age);
       apiForm.sex = Number(form.sex);
-      ['cp','trestbps','chol','fbs','restecg','thalach','exang','oldpeak','slope','ca','thal'].forEach(f => {
+      ['cp', 'trestbps', 'chol', 'fbs', 'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal'].forEach(f => {
         if (apiForm[f] !== undefined && apiForm[f] !== "") apiForm[f] = Number(apiForm[f]);
       });
       if (patientId) apiForm.patientId = patientId;
@@ -80,8 +80,8 @@ const HeartPredictionForm = () => {
     <div className="w-full flex flex-col md:flex-row items-start p-6 md:items-stretch justify-center gap-6">
       <div className="w-full md:w-2/3 p-6 shadow rounded-lg" style={{ background: 'var(--card-bg)', color: 'var(--app-text)' }}>
         <h2 className="text-2xl font-bold mb-4">Heart Disease Risk Prediction</h2>
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex flex-col">
+        <form onSubmit={handleSubmit} className="md:grid md:grid-cols-2 gap-4">
+          <div className="flex flex-col mb-4">
             <label className="mb-1 font-medium">Age</label>
             <input
               type="number"
@@ -94,7 +94,7 @@ const HeartPredictionForm = () => {
               readOnly
             />
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col mb-4">
             <label className="mb-1 font-medium">Sex (0=Female, 1=Male)</label>
             <input
               type="number"
@@ -110,7 +110,7 @@ const HeartPredictionForm = () => {
           {Object.keys(form)
             .filter(key => key !== 'age' && key !== 'sex')
             .map((key) => (
-              <div key={key} className="flex flex-col">
+              <div key={key} className="flex flex-col mb-4">
                 <label className="mb-1 font-medium capitalize">{key}</label>
                 <input
                   type="text"
@@ -126,11 +126,8 @@ const HeartPredictionForm = () => {
           <div className="col-span-2">
             <button
               type="submit"
-              className="w-full font-bold py-2 px-4 rounded-lg transition-all"
-              style={{ background: 'var(--accent)', color:'#fff' }}
+              className="w-full py-2 px-4 rounded-lg bg-blue-600 hover:bg-blue-500 text-white"
               disabled={loading}
-              onMouseEnter={e=>e.currentTarget.style.background='var(--accent-hover)'}
-              onMouseLeave={e=>e.currentTarget.style.background='var(--accent)'}
             >
               {loading ? 'Predicting...' : 'Predict'}
             </button>

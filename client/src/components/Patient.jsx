@@ -80,12 +80,11 @@ const Patient = ({ onDelete }) => {
 		}
 	};
 
-	// Calculate appointment notification for high-risk patients
 	const getAppointmentInfo = () => {
 		if (!patient || patient.heartRiskScore < 0.5 || !patient.lastCheckup) return null;
 		const lastCheckup = new Date(patient.lastCheckup);
 		const nextAppointment = new Date(lastCheckup);
-		nextAppointment.setDate(nextAppointment.getDate() + 28); // 4 weeks = 28 days
+		nextAppointment.setDate(nextAppointment.getDate() + 28);
 		const today = new Date();
 		const daysUntil = Math.ceil((nextAppointment - today) / (1000 * 60 * 60 * 24));
 		const isOverdue = daysUntil < 0;
@@ -98,9 +97,9 @@ const Patient = ({ onDelete }) => {
 	if (!patient) return <div className="text-center p-6" style={{ color: 'var(--text-muted)' }}>No patient selected</div>;
 
 	return (
-		<div className="w-full flex items-center flex-col">
-			<div className="mb-3 w-full md:w-2/3 mx-auto p-6 shadow rounded-lg mt-6" style={{ background: 'var(--card-bg)', color: 'var(--app-text)' }}>
-				<div className="flex items-start justify-between gap-4">
+		<div className="w-full flex items-center flex-col p-4">
+			<div className="w-full md:w-2/3 mx-auto p-6 shadow rounded-lg mt-6" style={{ background: 'var(--card-bg)', color: 'var(--app-text)' }}>
+				<div className="md:flex items-start justify-between gap-4">
 					<div>
 						<h2 className="text-2xl font-bold">{patient.name}</h2>
 						<p className="text-sm" style={{ color: 'var(--text-muted)' }}>{patient.email}</p>
@@ -152,28 +151,32 @@ const Patient = ({ onDelete }) => {
 								</p>
 							</div>
 						)}
-					</div>
-					<div className="flex flex-col items-end gap-4">
-						<div className="flex gap-2">
-							<button onClick={() => window.location.href = `/edit-patient/${patient._id}`} className="rounded-lg px-4 py-1 font-bold shadow card transition-all" style={{background:'var(--accent)',color:'#fff'}} onMouseEnter={e=>e.currentTarget.style.background='var(--accent-hover)'} onMouseLeave={e=>e.currentTarget.style.background='var(--accent)'}>Edit</button>
-							<button onClick={() => window.location.href = `/heart-risk/${patient._id}`} className="rounded-lg px-4 py-1 font-bold shadow card transition-all" style={{background:'#22d3ee',color:'#fff',marginLeft:'0.5rem'}} onMouseEnter={e=>e.currentTarget.style.background='#06b6d4'} onMouseLeave={e=>e.currentTarget.style.background='#22d3ee'}>Calculate Heart Risk</button>
-							<button onClick={handleDelete} className="rounded-lg px-4 py-1 font-bold shadow card transition-all" style={{background:'#ef4444',color:'#fff',marginLeft:'0.5rem'}} onMouseEnter={e=>e.currentTarget.style.background='#dc2626'} onMouseLeave={e=>e.currentTarget.style.background='#ef4444'}>Delete</button>
-						</div>
-						{patient.heartRiskScore != null ? (
-							<div className="w-44">
-								<HeartRiskCard probability={patient.heartRiskScore} label={patient.heartRiskLabel ?? 0} />
+
+						{patient.medicalHistory && (
+							<div className="mt-6">
+								<h3 className="font-medium mb-2">Medical History</h3>
+								<p className="text-sm whitespace-pre-wrap" style={{ color: 'var(--app-text)' }}>{patient.medicalHistory}</p>
 							</div>
-						) : (
-							<div style={{ color: 'var(--text-muted)' }}>No risk score</div>
 						)}
 					</div>
-				</div>
-				{patient.medicalHistory && (
-					<div className="mt-6">
-						<h3 className="font-medium mb-2">Medical History</h3>
-						<p className="text-sm whitespace-pre-wrap" style={{ color: 'var(--app-text)' }}>{patient.medicalHistory}</p>
+					<div className="flex flex-col-reverse md:flex-col md:items-end gap-4 mt-4 md:mt-0">
+						<div className="flex gap-2">
+							<button onClick={() => window.location.href = `/edit-patient/${patient._id}`} className="rounded-xl px-4 py-1 bg-blue-600 hover:bg-blue-500 text-white">Edit</button>
+							<button onClick={() => window.location.href = `/heart-risk/${patient._id}`} className="rounded-xl px-4 py-1 bg-green-600 hover:bg-green-500 text-white">Calculate Heart Risk</button>
+							<button onClick={handleDelete} className="rounded-xl px-4 py-1 bg-red-600 hover:bg-red-500 text-white">Delete</button>
+						</div>
+						<div>
+							{patient.heartRiskScore != null ? (
+								<div className="w-44">
+									<HeartRiskCard probability={patient.heartRiskScore} label={patient.heartRiskLabel ?? 0} />
+								</div>
+							) : (
+								<div style={{ color: 'var(--text-muted)' }}>No risk score</div>
+							)}
+						</div>
 					</div>
-				)}
+				</div>
+
 			</div>
 
 			{predictionHistory.length > 0 && (

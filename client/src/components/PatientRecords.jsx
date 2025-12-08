@@ -16,7 +16,7 @@ const PatientRecords = () => {
                 const response = await axios.get(`${backend}/api/patient`);
                 setRecords(response.data.patients);
             } catch (error) {
-                toast.error("Error fetching patient records: " + error.message);  
+                toast.error("Error fetching patient records: " + error.message);
             }
         };
 
@@ -51,11 +51,11 @@ const PatientRecords = () => {
     };
 
     return (
-        <div className="w-full flex items-center flex-col mt-auto">
+        <div className="w-full flex items-center flex-col mt-auto p-4">
             <div className="mb-3 w-full md:w-2/3 mx-auto p-6 shadow rounded-lg mt-6" style={{ background: 'var(--card-bg)', color: 'var(--app-text)' }}>
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold mb-4">Patient Records</h2>
-                    <button onClick={() => window.location.href = "/add-patient"} className="px-4 py-2 rounded-lg font-semibold transition-all card flex items-center gap-2" style={{background:'var(--accent)', color:'#fff'}} onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-hover)'} onMouseLeave={e => e.currentTarget.style.background = 'var(--accent)'}><FaPlus /> Add Patient</button>
+                    <button onClick={() => window.location.href = "/add-patient"} className="px-4 py-2 rounded-lg text-white flex items-center gap-2 bg-blue-600 hover:bg-blue-500" ><FaPlus /> Add Patient</button>
                 </div>
                 {records.length === 0 ? (
                     <p className="text-gray-500">No patient records found.</p>

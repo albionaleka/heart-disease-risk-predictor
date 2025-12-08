@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 const EditPatient = ({ onSuccess }) => {
   const { backend } = useContext(AppContext);
   const navigate = useNavigate();
-  const { patientId } = useParams(); // <-- get patientId from params
+  const { patientId } = useParams();
 
   const [form, setForm] = useState(() => ({
     name: '',
@@ -75,7 +75,7 @@ const EditPatient = ({ onSuccess }) => {
   };
 
   return (
-    <div className="w-full flex items-center flex-col">
+    <div className="w-full flex items-center flex-col p-4">
       <div className="mb-3 w-full md:w-2/3 mx-auto p-6 shadow rounded-lg mt-6" style={{ background: 'var(--card-bg)', color: 'var(--app-text)' }}>
         <h2 className="text-2xl font-bold mb-4">Edit Patient</h2>
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -119,7 +119,7 @@ const EditPatient = ({ onSuccess }) => {
             <textarea name="medicalHistory" value={form.medicalHistory} onChange={handleChange} className="border border-gray-300 rounded px-3 py-2 h-28 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-transparent" style={{ color: 'var(--app-text)' }} />
           </div>
           <div className="col-span-1 md:col-span-2">
-            <button type="submit" className="w-full rounded-lg font-bold py-2 px-4 shadow card transition-all mt-2" style={{background:'var(--accent)', color:'#fff'}} onMouseEnter={e=>e.currentTarget.style.background='var(--accent-hover)'} onMouseLeave={e=>e.currentTarget.style.background='var(--accent)'}>Update</button>
+            <button type="submit" className="w-full rounded-lg py-2 px-4 mt-2 bg-blue-600 hover:bg-blue-500 text-white">Update</button>
           </div>
         </form>
       </div>
