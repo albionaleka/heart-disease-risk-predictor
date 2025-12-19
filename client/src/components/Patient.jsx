@@ -75,7 +75,7 @@ const Patient = ({ onDelete }) => {
 			} else {
 				toast.error("Error: " + data.message);
 			}
-		} catch (err) {
+		} catch {
 			toast.error("Failed to delete patient");
 		}
 	};
@@ -219,7 +219,7 @@ const Patient = ({ onDelete }) => {
 												<span className="font-semibold" style={{ color: isHighRisk ? '#ef4444' : '#22d3ee' }}>{riskPercent}%</span>
 											</td>
 											<td className="px-4 py-2">
-												<span className="text-sm px-2 py-1 rounded" style={{ background: pred.prediction === 1 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 211, 238, 0.1)', color: pred.prediction === 1 ? '#ef4444' : '#22d3ee' }}>{pred.prediction === 1 ? 'Disease Detected' : 'No Disease'}</span>
+												<span className="text-sm px-2 py-1 rounded" style={{ background: pred.prediction === 1 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 211, 238, 0.1)', color: pred.prediction === 1 ? '#ef4444' : '#22d3ee' }}>{pred.prediction === 1 ? 'Disease Predicted' : 'Disease Risk not Predicted'}</span>
 											</td>
 											<td className="px-4 py-2 text-sm" style={{ color: 'var(--app-text)' }}>{pred.age}</td>
 											<td className="px-4 py-2 text-sm" style={{ color: 'var(--app-text)' }}>{pred.chol} mg/dL</td>

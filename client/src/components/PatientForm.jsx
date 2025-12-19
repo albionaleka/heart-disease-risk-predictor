@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { AppContext } from "../context/AppContext";
+import { toast } from "react-toastify";
 
 const PatientForm = () => {
     const { backend } = useContext(AppContext);
@@ -32,7 +33,7 @@ const PatientForm = () => {
             });
             const data = await res.json();
             if (data.success) {
-                alert('Patient created successfully!');
+                toast.success('Patient created successfully!');
                 setForm({
                     name: '',
                     age: '',
@@ -48,7 +49,7 @@ const PatientForm = () => {
             }
         } catch (err) {
             console.error(err);
-            alert('An error occurred while creating the patient.');
+            toast.error('An error occurred while creating the patient.');
         }
     };
 
